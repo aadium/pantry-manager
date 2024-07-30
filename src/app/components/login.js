@@ -27,6 +27,7 @@ export default function LoginPage() {
         if (response.ok) {
             setLoading(false)
             console.log('Login successful!')
+            router.push('/dashboard')
         } else {
             setLoading(false)
             const errorData = await response.json()
