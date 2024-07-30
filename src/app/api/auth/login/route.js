@@ -1,22 +1,23 @@
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import {NextResponse} from "next/server";
+import firebase from "@/app/firebase";
+import { NextResponse } from "next/server";
 
-export async function POST(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
-    }
-
+export async function POST(req) {
     try {
-        const { email, password } = req.body;
+        const { email, password } = await req.json();
+        if (!email || !password) {
+            return NextResponse.json({ error: 'Email and password are required.' }, { status: 400 });
+        }
+
         const result = await firebase.auth().signInWithEmailAndPassword(email, password);
-        console.log(result);
-        return NextResponse.json({ success: true });
+        return NextResponse.json({ success: true, user: result.user });
     } catch (error) {
         if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
-            return NextResponse.json({ error: 'Invalid credentials.' });
+            return NextResponse.json({ error: 'Invalid credentials.', msg: error.message }, { status: 401 });
+        } else if (error.code === 'auth/missing-email') {
+            return NextResponse.json({ error: 'Email is required.' }, { status: 400 });
         } else {
-            return NextResponse.json({ error: 'Something went wrong.' });
+            console.error(error);
+            return NextResponse.json({ error: 'Something went wrong.' }, { status: 500 });
         }
     }
 }
