@@ -1,9 +1,9 @@
-import { signIn } from '@/auth'
+import firebase from 'firebase/app'
 
 export default async function handler(req, res) {
     try {
         const { email, password } = req.body
-        await signIn('credentials', { email, password })
+        await firebase.auth().signInWithEmailAndPassword(email, password);
 
         res.status(200).json({ success: true })
     } catch (error) {
