@@ -19,13 +19,17 @@ const Header = () => {
         }
     }
     return (
-        <AppBar position="static">
+        <AppBar position="fixed">
             <Toolbar>
                 <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                     Pantry
                 </Typography>
                 <Button color="inherit" onClick={
                     async () => {
+                        const confirm = window.confirm('Are you sure you want to logout?');
+                        if (!confirm) {
+                            return;
+                        }
                         const response = await logout();
                         if (response.success) {
                             window.location.href = '/login';

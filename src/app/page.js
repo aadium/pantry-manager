@@ -227,6 +227,10 @@ export default function Inventory() {
   return (
     <div>
       <Header />
+      <br />
+      <br />
+      <br />
+      <br />
       <Container>
         <Box sx={{
           marginY: 2,

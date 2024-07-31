@@ -4,8 +4,9 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { TextField, Button, Container, Typography, Box } from '@mui/material'
 import {CircularProgress} from "@mui/material";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import classes from '../page.module.css'
+import firebase from 'firebase/compat/app';
+import 'firebase/auth';
 
 export default function LoginPage() {
     const router = useRouter()
@@ -18,8 +19,7 @@ export default function LoginPage() {
                 return { error: 'Email and password are required.' };
             }
     
-            const auth = getAuth();
-            const result = await signInWithEmailAndPassword(auth, email, password);
+            const result = await firebase.auth().signInWithEmailAndPassword(email, password);
             console.log('User signed in successfully:', result.user);
             return { success: true, user: result.user };
         } catch (error) {
