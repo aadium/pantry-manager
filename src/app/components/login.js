@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { TextField, Button, Container, Typography, Box } from '@mui/material'
 import {CircularProgress} from "@mui/material";
 import firebase from '@/app/firebase'
+import { getAuth, setPersistence, browserSessionPersistence, browserLocalPersistence, signInWithEmailAndPassword } from "firebase/auth";
 
 export default function LoginPage() {
     const router = useRouter()
@@ -14,10 +15,15 @@ export default function LoginPage() {
     async function login(email, password) {
         try {
             if (!email || !password) {
-                return { error: 'Email and password are required.' }
+                return { error: 'Email and password are required.' };
             }
-            await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-            const result = await firebase.auth().signInWithEmailAndPassword(email, password);
+    
+            const auth = getAuth();
+            await setPersistence(auth, browserSessionPersistence);
+    
+            const result = await signInWithEmailAndPassword(auth, email, password);
+    
+            console.log('User signed in successfully:', result.user);
             return { success: true, user: result.user };
         } catch (error) {
             if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
@@ -25,7 +31,7 @@ export default function LoginPage() {
             } else if (error.code === 'auth/missing-email') {
                 return { error: 'Email is required.' };
             } else {
-                console.error(error);
+                console.error('Error during login:', error);
                 return { error: 'Something went wrong.' };
             }
         }
