@@ -33,21 +33,11 @@ const AddItemModal = ({ open, handleClose }) => {
     }
     const handleAddItem = async () => {
         const itemName = document.getElementById('item-name').value;
-        const itemBrand = document.getElementById('item-brand').value;
-        const itemPrice = document.getElementById('item-price').value;
-        const itemQty = document.getElementById('item-qty').value;
+        const itemQty = 1;
         const img = imgUrl;
         if (!itemName) {
             console.error('Item name is required.');
             alert('Item name is required.');
-            return;
-        } else if (!itemBrand) {
-            console.error('Item brand is required.');
-            alert('Item brand is required.');
-            return;
-        } else if (!itemPrice) {
-            console.error('Item price is required.');
-            alert('Item price is required.');
             return;
         } else if (!itemQty) {
             console.error('Item quantity is required.');
@@ -60,9 +50,7 @@ const AddItemModal = ({ open, handleClose }) => {
         }
         const item = {
             name: itemName,
-            brand: itemBrand,
-            price: Number(itemPrice),
-            qty: Number(itemQty),
+            qty: itemQty,
             img: img
         };
         const result = await addItem(item);
@@ -100,27 +88,7 @@ const AddItemModal = ({ open, handleClose }) => {
                     fullWidth
                     sx={{ mt: 2 }}
                 />
-                <TextField
-                    id="item-brand"
-                    label="Brand"
-                    variant="outlined"
-                    fullWidth
-                    sx={{ mt: 2 }}
-                />
-                <TextField
-                    id="item-price"
-                    label="Price"
-                    variant="outlined"
-                    fullWidth
-                    sx={{ mt: 2 }}
-                />
-                <TextField
-                    id="item-qty"
-                    label="Quantity"
-                    variant="outlined"
-                    fullWidth
-                    sx={{ mt: 2 }}
-                />
+                {imgUrl ? <Typography variant="body1" sx={{ mt: 2 }}>Image uploaded successfully.</Typography> : null}
                 <label htmlFor="upload-image" style={{ display: 'inline-block' }}>
                     <input
                         id="upload-image"

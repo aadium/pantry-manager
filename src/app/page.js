@@ -38,6 +38,50 @@ export default function Inventory() {
     }
   }
 
+  const deleteItem = async (item) => {
+    try {
+      const user = firebase.auth().currentUser;
+      if (!user) {
+        console.error('User not authenticated.');
+        return { error: 'User not authenticated.' };
+      }
+  
+      const collectionRef = firebase.firestore().collection("pantry");
+  
+      console.log(`Attempting to delete document with name: ${item.name}`);
+  
+      const querySnapshot = await collectionRef.where('name', '==', item.name).get();
+      if (querySnapshot.empty) {
+        console.error('Document does not exist.');
+        return { error: 'Document does not exist.' };
+      }
+  
+      const docRef = querySnapshot.docs[0].ref;
+  
+      await docRef.delete();
+      console.log(`Document with name ${item.name} deleted successfully.`);
+  
+      const snapshot = await collectionRef.get();
+      const documents = snapshot.docs.map(doc => doc.data());
+      console.log(documents);
+    } catch (error) {
+      console.error('Error deleting document:', error);
+      return { error: 'Something went wrong.' };
+    }
+  }
+
+  const handleDeleteItem = async (item) => {
+    let confirmDelete = confirm('Are you sure you want to delete this item?');
+    if (!confirmDelete) {
+      return;
+    }
+    try {
+      const result = await deleteItem(item);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   async function check() {
     const auth = getAuth();
     return new Promise((resolve, reject) => {
@@ -109,7 +153,7 @@ export default function Inventory() {
                   border: '1px solid #ccc',
                   borderRadius: 4,
                 }}>
-                  <img src={item.img} alt="placeholder" style={{ height: '200px', borderRadius: '4px 4px 0 0' }} />                  
+                  <img src={item.img} alt="placeholder" style={{ height: '200px', borderRadius: '4px 4px 0 0' }} />
                   <TableContainer component={Paper} sx={{
                     boxShadow: 0,
                   }}>
@@ -120,20 +164,15 @@ export default function Inventory() {
                           <TableCell>{item.name}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableCell>Brand</TableCell>
-                          <TableCell>{item.brand}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>Price</TableCell>
-                          <TableCell>{item.price}</TableCell>
-                        </TableRow>
-                        <TableRow>
                           <TableCell>Quantity</TableCell>
                           <TableCell>{item.qty}</TableCell>
                         </TableRow>
                       </TableBody>
                     </Table>
                   </TableContainer>
+                  <Button variant="contained" color="error" sx={{ marginTop: 2 }} fullWidth onClick={() => handleDeleteItem(item)}>
+                    Delete
+                  </Button>
                 </Box>
               </Grid>
             ))}
