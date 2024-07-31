@@ -5,8 +5,8 @@ import { useState } from 'react'
 import { TextField, Button, Container, Typography, Box } from '@mui/material'
 import {CircularProgress} from "@mui/material";
 import classes from '../page.module.css'
-import firebase from 'firebase/compat/app';
-import 'firebase/auth';
+import firebase from '@/app/firebase'
+import 'firebase/compat/auth';
 
 export default function LoginPage() {
     const router = useRouter()
