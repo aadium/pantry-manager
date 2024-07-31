@@ -4,8 +4,8 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { TextField, Button, Container, Typography, Box } from '@mui/material'
 import {CircularProgress} from "@mui/material";
-import firebase from '@/app/firebase'
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import classes from '../page.module.css'
 
 export default function LoginPage() {
     const router = useRouter()
