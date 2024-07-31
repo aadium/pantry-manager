@@ -6,16 +6,29 @@ import { TextField, Button, Container, Typography, Box, IconButton } from '@mui/
 import { CircularProgress } from "@mui/material";
 import { AddRounded, SearchRounded } from '@mui/icons-material';
 import firebase from '@/app/firebase'
+import 'firebase/compat/firestore';
+import 'firebase/compat/auth'; // Import Firebase Auth
 
 export default function Dashboard() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [pantry, setPantry] = useState([])
 
-  const fetchData = async () => {
-    const res = await fetch('/api/pantry')
-    const data = await res.json()
-    setPantry(data)
+  async function fetchData(req) {
+    try {
+        const user = firebase.auth().currentUser;
+        if (!user) {
+          return { error: 'User not authenticated.' };
+        }
+        const collectionRef = firebase.firestore().collection("pantry");
+        const snapshot = await collectionRef.get();
+        const documents = snapshot.docs.map(doc => doc.data());
+        console.log(documents);
+        setPantry(documents);
+    } catch (error) {
+        console.error(error);
+        return NextResponse.json({ error: 'Something went wrong.' }, { status: 500 });
+    }
   }
 
   async function check() {
@@ -35,10 +48,9 @@ export default function Dashboard() {
   useEffect(() => {
     const checkAuth = async () => {
       const res = await check()
-      const data = res
+      const data = res;
       if (!data.success) {
         router.push('/')
-        return
       }
       fetchData();
     };
