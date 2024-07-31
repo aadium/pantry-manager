@@ -4,11 +4,32 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { TextField, Button, Container, Typography, Box } from '@mui/material'
 import {CircularProgress} from "@mui/material";
+import firebase from '@/app/firebase'
 
 export default function LoginPage() {
     const router = useRouter()
     const [error, setError] = useState(null)
     const [loading, setLoading] = useState(false)
+
+    async function login(email, password) {
+        try {
+            if (!email || !password) {
+                return { error: 'Email and password are required.' }
+            }
+            await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+            const result = await firebase.auth().signInWithEmailAndPassword(email, password);
+            return { success: true, user: result.user };
+        } catch (error) {
+            if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+                return { error: 'Invalid credentials.', msg: error.message };
+            } else if (error.code === 'auth/missing-email') {
+                return { error: 'Email is required.' };
+            } else {
+                console.error(error);
+                return { error: 'Something went wrong.' };
+            }
+        }
+    }
 
     async function handleSubmit(event) {
         event.preventDefault()
@@ -18,19 +39,15 @@ export default function LoginPage() {
         const email = formData.get('email')
         const password = formData.get('password')
 
-        const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
-        })
+        const response = await login(email, password);
 
-        if (response.ok) {
+        if (response.success) {
             setLoading(false)
             console.log('Login successful!')
             router.push('/dashboard')
         } else {
             setLoading(false)
-            const errorData = await response.json()
+            const errorData = response.error;
             setError(errorData.error || 'An error occurred. Please try again.')
         }
     }

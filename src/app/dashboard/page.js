@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { TextField, Button, Container, Typography, Box, IconButton } from '@mui/material'
 import { CircularProgress } from "@mui/material";
 import { AddRounded, SearchRounded } from '@mui/icons-material';
+import firebase from '@/app/firebase'
 
 export default function Dashboard() {
   const router = useRouter()
@@ -17,10 +18,24 @@ export default function Dashboard() {
     setPantry(data)
   }
 
+  async function check() {
+    try {
+      const currentUser = firebase.auth().currentUser;
+      if (currentUser) {
+        return { success: true, user: currentUser, message: 'User is logged in.' };
+      } else {
+        return { success: false, message: 'No user is logged in.' };
+      }
+    } catch (error) {
+      console.error(error);
+      return { error: 'Something went wrong.' };
+    }
+  }
+
   useEffect(() => {
     const checkAuth = async () => {
-      const res = await fetch('/api/auth/check')
-      const data = await res.json()
+      const res = await check()
+      const data = res
       if (!data.success) {
         router.push('/')
         return
@@ -63,7 +78,8 @@ export default function Dashboard() {
               borderRadius: 4,
             }}>
               <Typography>{item.name}</Typography>
-              <Typography>{item.quantity}</Typography>
+              <Typography>{item.price}</Typography>
+              <Typography>{item.qty}</Typography>
             </Box>
           ))}
         </Box>
