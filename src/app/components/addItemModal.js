@@ -33,7 +33,7 @@ const AddItemModal = ({ open, handleClose }) => {
     }
     const handleAddItem = async () => {
         const itemName = document.getElementById('item-name').value;
-        const itemQty = 1;
+        const itemQty = parseInt(document.getElementById('item-qty').value);
         const img = imgUrl;
         if (!itemName) {
             console.error('Item name is required.');
@@ -84,6 +84,13 @@ const AddItemModal = ({ open, handleClose }) => {
                 <TextField
                     id="item-name"
                     label="Name"
+                    variant="outlined"
+                    fullWidth
+                    sx={{ mt: 2 }}
+                />
+                <TextField
+                    id="item-qty"
+                    label="Quantity"
                     variant="outlined"
                     fullWidth
                     sx={{ mt: 2 }}
